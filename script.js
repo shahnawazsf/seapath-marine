@@ -1,156 +1,130 @@
-// ── Preloader ────────────────────────────────────────────
+// ── Preloader ─────────────────────────────────────
 const preloader = document.getElementById('preloader');
-window.addEventListener('load', () => {
-  setTimeout(() => preloader.classList.add('hidden'), 400);
-});
-// Fallback: hide after 2.5s even if load event is slow
+window.addEventListener('load', () => setTimeout(() => preloader.classList.add('hidden'), 300));
 setTimeout(() => preloader.classList.add('hidden'), 2500);
 
-// ── Navbar scroll effect ─────────────────────────────────
-const navbar = document.getElementById('navbar');
+// ── Navbar + Back-to-top ──────────────────────────
+const navbar    = document.getElementById('navbar');
 const backToTop = document.getElementById('backToTop');
-
-const onScroll = () => {
-  const scrolled = window.scrollY > 60;
-  navbar.classList.toggle('scrolled', scrolled);
-  backToTop.classList.toggle('visible', window.scrollY > 400);
-};
-window.addEventListener('scroll', onScroll, { passive: true });
-onScroll();
-
-backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-// ── Hamburger menu ───────────────────────────────────────
-const hamburger = document.getElementById('hamburger');
-const navLinks  = document.getElementById('navLinks');
 const overlay   = document.createElement('div');
 overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:998;display:none;backdrop-filter:blur(3px)';
 document.body.appendChild(overlay);
+
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+  backToTop.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+
+backToTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// ── Mobile menu ───────────────────────────────────
+const hamburger = document.getElementById('hamburger');
+const navLinks  = document.getElementById('navLinks');
 
 function closeMenu() {
   hamburger.classList.remove('active');
   navLinks.classList.remove('open');
   overlay.style.display = 'none';
+  document.body.style.overflow = '';
 }
 
 hamburger.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
   hamburger.classList.toggle('active', isOpen);
   overlay.style.display = isOpen ? 'block' : 'none';
+  document.body.style.overflow = isOpen ? 'hidden' : '';
 });
 
 overlay.addEventListener('click', closeMenu);
 navLinks.querySelectorAll('a').forEach(l => l.addEventListener('click', closeMenu));
 
-// ── Active nav link on scroll ────────────────────────────
+// ── Active nav on scroll ──────────────────────────
 const sections = document.querySelectorAll('section[id]');
 const links    = document.querySelectorAll('.nav-links a[href^="#"]');
 
-const sectionObserver = new IntersectionObserver(entries => {
+new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
-      const id = e.target.id;
-      links.forEach(l => {
-        l.classList.toggle('active', l.getAttribute('href') === `#${id}`);
-      });
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${e.target.id}`));
     }
   });
-}, { rootMargin: '-40% 0px -55% 0px' });
+}, { rootMargin: '-40% 0px -55% 0px' }).observe;
 
-sections.forEach(s => sectionObserver.observe(s));
-
-// ── Hero particles ───────────────────────────────────────
-const particleContainer = document.getElementById('particles');
-const PARTICLE_COUNT = 28;
-
-for (let i = 0; i < PARTICLE_COUNT; i++) {
-  const span = document.createElement('span');
-  const size = Math.random() * 3 + 1.5;
-  const left = Math.random() * 100;
-  const delay = Math.random() * 14;
-  const duration = 10 + Math.random() * 18;
-  const opacity = 0.15 + Math.random() * 0.4;
-
-  span.style.cssText = `
-    left:${left}%;
-    bottom:${Math.random() * 30}%;
-    width:${size}px;
-    height:${size}px;
-    opacity:${opacity};
-    animation-duration:${duration}s;
-    animation-delay:${delay}s;
-  `;
-  particleContainer.appendChild(span);
-}
-
-// ── Animated stat counters ───────────────────────────────
-const statNums = document.querySelectorAll('.stat-num[data-target]');
-
-const countUp = (el) => {
-  const target = parseInt(el.dataset.target, 10);
-  const duration = 1800;
-  const startTime = performance.now();
-
-  const update = (currentTime) => {
-    const elapsed = currentTime - startTime;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    el.textContent = Math.floor(eased * target);
-    if (progress < 1) requestAnimationFrame(update);
-    else el.textContent = target;
-  };
-  requestAnimationFrame(update);
-};
-
-const counterObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      countUp(e.target);
-      counterObserver.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.5 });
-
-statNums.forEach(el => counterObserver.observe(el));
-
-// ── Scroll reveal ─────────────────────────────────────────
-const revealObserver = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('revealed');
-      revealObserver.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.08 });
-
-document.querySelectorAll(
-  '.service-card, .port-card, .value-pill, .contact-card, .stat-item, .commit-body, .tariff-notes, .about-card-main, .about-card-accent, .gallery-item'
-).forEach(el => {
-  el.classList.add('reveal');
-  revealObserver.observe(el);
+sections.forEach(s => {
+  new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting)
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${e.target.id}`));
+    });
+  }, { rootMargin: '-40% 0px -55% 0px' }).observe(s);
 });
 
-// ── Gallery lightbox ─────────────────────────────────────
-const lightbox = document.createElement('div');
-lightbox.className = 'lightbox';
-lightbox.innerHTML = `
-  <button class="lightbox-close" aria-label="Close">✕</button>
-  <img src="" alt="" />
-  <div class="lightbox-caption"></div>
-`;
-document.body.appendChild(lightbox);
+// ── Hero particles ────────────────────────────────
+(function() {
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:1';
+  document.querySelector('.hero').appendChild(wrap);
 
-const lbImg     = lightbox.querySelector('img');
-const lbCaption = lightbox.querySelector('.lightbox-caption');
-const lbClose   = lightbox.querySelector('.lightbox-close');
+  for (let i = 0; i < 22; i++) {
+    const s = document.createElement('span');
+    const size = Math.random() * 3 + 1;
+    s.style.cssText = `
+      position:absolute;border-radius:50%;
+      background:rgba(255,255,255,${0.15 + Math.random() * 0.25});
+      width:${size}px;height:${size}px;
+      left:${Math.random() * 100}%;
+      bottom:${Math.random() * 30}%;
+      animation:particle-rise ${10 + Math.random() * 18}s linear ${Math.random() * 14}s infinite;
+    `;
+    wrap.appendChild(s);
+  }
 
-document.querySelectorAll('.gallery-item').forEach(item => {
+  const style = document.createElement('style');
+  style.textContent = `@keyframes particle-rise{0%{transform:translateY(0);opacity:0}10%{opacity:1}90%{opacity:.4}100%{transform:translateY(-100vh);opacity:0}}`;
+  document.head.appendChild(style);
+})();
+
+// ── Animated counters ─────────────────────────────
+const counters = document.querySelectorAll('.hs-num[data-target]');
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const target = +el.dataset.target;
+    const start = performance.now();
+    const dur = 1800;
+    const tick = now => {
+      const p = Math.min((now - start) / dur, 1);
+      el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    };
+    requestAnimationFrame(tick);
+    counterObs.unobserve(el);
+  });
+}, { threshold: 0.5 });
+counters.forEach(c => counterObs.observe(c));
+
+// ── Services accordion ────────────────────────────
+document.querySelectorAll('.acc-head').forEach(head => {
+  head.addEventListener('click', () => {
+    const item = head.parentElement;
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.acc-item.open').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ── Gallery lightbox ──────────────────────────────
+const lightbox = document.getElementById('lightbox');
+const lbImg    = document.getElementById('lbImg');
+const lbCap    = document.getElementById('lbCap');
+const lbClose  = document.getElementById('lbClose');
+
+document.querySelectorAll('.g-item').forEach(item => {
   item.addEventListener('click', () => {
-    const img = item.querySelector('img');
-    const cap = item.querySelector('.gc-tag');
-    lbImg.src = img.src;
-    lbImg.alt = img.alt;
-    lbCaption.textContent = cap ? cap.textContent : '';
+    lbImg.src = item.querySelector('img').src;
+    lbCap.textContent = item.querySelector('.g-cap span')?.textContent || '';
     lightbox.classList.add('open');
     document.body.style.overflow = 'hidden';
   });
@@ -166,9 +140,22 @@ lbClose.addEventListener('click', closeLightbox);
 lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-// ── Contact form → Formsubmit.co ─────────────────────────
+// ── Scroll reveal ─────────────────────────────────
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('revealed'); revealObs.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.acc-item,.port-card,.av-item,.g-item,.office-block,.form-card,.tn-item').forEach((el, i) => {
+  el.classList.add('reveal');
+  el.style.transitionDelay = `${(i % 6) * 0.07}s`;
+  revealObs.observe(el);
+});
+
+// ── Contact form ──────────────────────────────────
 document.getElementById('contactForm').addEventListener('submit', function() {
   const btn = document.getElementById('formBtn');
-  btn.innerHTML = 'Sending…';
-  btn.disabled  = true;
+  btn.querySelector('span').textContent = 'Sending…';
+  btn.disabled = true;
 });
