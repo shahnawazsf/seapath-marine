@@ -30,7 +30,7 @@
   <nav class="navbar" id="navbar">
     <div class="nav-container">
       <a href="#home" class="nav-logo">
-        <img src="image.png" alt="Sea Path Marine Services" class="logo-img" />
+        <img src="images/logo.png" alt="Sea Path Marine Services" class="logo-img" />
         <div class="logo-text">
           <span class="logo-main">Sea Path</span>
           <span class="logo-sub">Marine Services</span>
@@ -497,14 +497,17 @@
               <span class="cc-region">We'll respond promptly</span>
             </div>
           </div>
-          <form class="contact-form" id="contactForm">
+          <form class="contact-form" id="contactForm" action="https://formsubmit.co/shahnawazsf@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New Enquiry — Sea Path Marine Services" />
+            <input type="hidden" name="_next" value="https://shahnawazsf.github.io/seapath-marine/#contact" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="hidden" name="_template" value="table" />
             <div class="form-row">
               <input type="text" name="name" placeholder="Your Name" required />
               <input type="email" name="email" placeholder="Your Email" required />
             </div>
             <input type="text" name="subject" placeholder="Subject" />
             <textarea name="message" placeholder="Your Message..." rows="4" required></textarea>
-            <div class="form-feedback" id="formFeedback"></div>
             <button type="submit" class="btn btn-primary full-width" id="formBtn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
               Send Message
@@ -522,7 +525,7 @@
     <div class="footer-inner">
       <div class="footer-brand">
         <a href="#home" class="footer-logo-link">
-          <img src="image.png" alt="Sea Path Marine Services" class="footer-logo-img" />
+          <img src="images/logo.png" alt="Sea Path Marine Services" class="footer-logo-img" />
           <div class="logo-text">
             <span class="logo-main">Sea Path</span>
             <span class="logo-sub">Marine Services</span>

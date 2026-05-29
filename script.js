@@ -167,45 +167,8 @@ lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightb
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
 // ── Contact form → Formsubmit.co ─────────────────────────
-document.getElementById('contactForm').addEventListener('submit', async e => {
-  e.preventDefault();
-  const form     = e.target;
-  const btn      = document.getElementById('formBtn');
-  const feedback = document.getElementById('formFeedback');
-  const origHTML = btn.innerHTML;
-
-  // Loading state
-  btn.innerHTML  = 'Sending…';
-  btn.disabled   = true;
-  feedback.className = 'form-feedback';
-
-  const data = {
-    name:    form.name.value,
-    email:   form.email.value,
-    subject: form.subject.value || 'Website Enquiry',
-    message: form.message.value
-  };
-
-  try {
-    const res = await fetch('https://formsubmit.co/ajax/shahnawazsf@gmail.com', {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body:    JSON.stringify(data)
-    });
-    const json = await res.json();
-
-    if (json.success === 'true' || json.success === true) {
-      feedback.textContent = '✓ Message sent! We will get back to you shortly.';
-      feedback.className   = 'form-feedback success';
-      form.reset();
-    } else {
-      throw new Error('Failed');
-    }
-  } catch {
-    feedback.textContent = '✕ Something went wrong. Please email us directly at rehan@seapathmarineservices.com';
-    feedback.className   = 'form-feedback error';
-  } finally {
-    btn.innerHTML = origHTML;
-    btn.disabled  = false;
-  }
+document.getElementById('contactForm').addEventListener('submit', function() {
+  const btn = document.getElementById('formBtn');
+  btn.innerHTML = 'Sending…';
+  btn.disabled  = true;
 });
